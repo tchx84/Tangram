@@ -258,5 +258,7 @@ export function buildWebView({
 
   webView.load_uri(url || BLANK_URI);
 
+  instance.webView = webView;
+
   return webView;
 }

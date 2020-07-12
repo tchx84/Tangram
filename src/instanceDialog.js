@@ -12,6 +12,7 @@ const {
 } = imports.gi.Gtk;
 const { SettingsBindFlags } = imports.gi.Gio;
 const { build_filenamev } = imports.gi.GLib;
+const { BindingFlags } = imports.gi.GObject;
 
 import { once } from "./troll/util";
 import { iconChooser, saveIcon } from "./icon";
@@ -38,7 +39,7 @@ async function instanceDialog({ window, instance, action }) {
     type_hint: WindowTypeHint.DIALOG,
     use_header_bar: true,
     transient_for: window,
-    resizable: false,
+    resizable: true,
   });
 
   dialog.add_button("Cancel", ResponseType.CANCEL);
@@ -114,22 +115,30 @@ async function instanceDialog({ window, instance, action }) {
     );
   });
 
-  const UserAgentLabel = new Label({
+  const userAgentLabel = new Label({
     label: "User Agent",
     halign: Align.END,
   });
-  grid.attach(UserAgentLabel, 1, 4, 1, 1);
+  grid.attach(userAgentLabel, 1, 4, 1, 1);
 
-  const UserAgentEntry = new Entry({
+  const userAgentEntry = new Entry({
     hexpand: true,
   });
   instance.bind(
     "user-agent",
-    UserAgentEntry,
+    userAgentEntry,
     "text",
     SettingsBindFlags.DEFAULT,
   );
-  grid.attach(UserAgentEntry, 2, 4, 1, 1);
+  instance.webView
+    .get_settings()
+    .bind_property(
+      "user_agent",
+      userAgentEntry,
+      "placeholder_text",
+      BindingFlags.SYNC_CREATE,
+    );
+  grid.attach(userAgentEntry, 2, 4, 1, 1);
 
   dialog.show_all();
 
